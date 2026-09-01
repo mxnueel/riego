@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>riego — calculadora de riego FAO-56</title>
+  <meta name="description" content="Calculadora de riego basada en el método FAO-56 Penman-Monteith. Elige tu cultivo y ubicación en México, y obtén una recomendación de riego real basada en el pronóstico del clima.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700&family=Red+Hat+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">riego</span>
+    </div>
+    <a class="source-link" href="https://github.com/mxnueel/riego" target="_blank" rel="noopener">Código fuente</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Cuánto regar, calculado con el método que usan los agrónomos.</h1>
+      <p class="hero-sub">FAO-56 Penman-Monteith: la evapotranspiración de referencia viene del pronóstico real del clima, y el coeficiente de cultivo (Kc) de las tablas oficiales de la FAO — ajustado a tu humedad y viento reales, no valores genéricos.</p>
+    </section>
+
+    <form id="calc-form" class="calc-form">
+      <div class="field">
+        <label for="crop-select">Cultivo</label>
+        <select id="crop-select" required></select>
+      </div>
+
+      <div class="field">
+        <label for="planting-date">Fecha de siembra</label>
+        <input type="date" id="planting-date" required>
+      </div>
+
+      <div class="field field-location">
+        <label for="location-input">Ubicación</label>
+        <input type="text" id="location-input" placeholder="Ej. Culiacán, Sinaloa" autocomplete="off">
+        <ul id="location-results" class="location-results" hidden></ul>
+        <div class="location-presets" id="location-presets"></div>
+        <p class="location-selected" id="location-selected" hidden></p>
+      </div>
+
+      <button type="submit" class="btn-calc" id="submit-btn" disabled>Calcular riego</button>
+    </form>
+
+    <div id="status" class="status" hidden></div>
+
+    <section id="results" class="results" hidden>
+      <div class="results-summary">
+        <div class="summary-card">
+          <span class="summary-label">Riego neto recomendado (7 días)</span>
+          <span class="summary-value" id="summary-mm">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Equivalente por hectárea</span>
+          <span class="summary-value" id="summary-lha">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Etapa actual del cultivo</span>
+          <span class="summary-value" id="summary-stage">—</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="days-table" class="days-table">
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Etapa</th>
+              <th>Kc</th>
+              <th>ET0</th>
+              <th>ETc</th>
+              <th>Lluvia</th>
+              <th>Riego neto</th>
+            </tr>
+          </thead>
+          <tbody id="days-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="about">
+      <h2>Cómo funciona</h2>
+      <p>La evapotranspiración de referencia (ET0) viene directo del pronóstico de <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, que ya calcula el método FAO Penman-Monteith. A partir de ahí, esta herramienta aplica el coeficiente de cultivo (Kc) de la Tabla 12 de la FAO-56 según la etapa de crecimiento real de tu siembra, ajustado por humedad mínima y viento reales del pronóstico (Ecuaciones 62 y 65 de FAO-56) — no un valor de tabla sin ajustar. El requerimiento neto de riego es ETc menos la lluvia pronosticada, un balance simplificado y deliberadamente conservador (no modela infiltración ni escurrimiento).</p>
+      <p class="about-note">Esta herramienta da una referencia técnica, no sustituye el criterio de un agrónomo ni mediciones de humedad de suelo en campo.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Hecho por <a href="https://github.com/mxnueel" target="_blank" rel="noopener">Manuel Bautista</a>, Ing. en Mecatrónica Agrícola — MIT License</p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
