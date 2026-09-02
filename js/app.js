@@ -23,6 +23,62 @@ const daysTbody = document.getElementById("days-tbody");
 
 let selectedLocation = null;
 
+const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+let resultsAnimHandle = 0;
+let resultsScale = 0.97;
+
+// Materialize the results (opacity + scale + blur together, not a plain
+// fade) reading the currently-visible value instead of the target one, so
+// re-submitting mid-animation doesn't jump. See /apple-design ("materialize,
+// don't just fade" + interruptibility).
+function revealResults() {
+  const wasHidden = resultsEl.hidden;
+  resultsEl.hidden = false;
+  cancelAnimationFrame(resultsAnimHandle);
+
+  if (reduceMotionQuery.matches) {
+    resultsEl.style.opacity = "1";
+    resultsEl.style.transform = "none";
+    resultsEl.style.filter = "none";
+    return;
+  }
+
+  const fromOpacity = wasHidden ? 0 : parseFloat(getComputedStyle(resultsEl).opacity) || 0;
+  const fromScale = wasHidden ? 0.97 : resultsScale;
+  const duration = 420;
+  const start = performance.now();
+
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3); // decelerates without overshoot, like a damping=1 spring
+    const opacity = fromOpacity + (1 - fromOpacity) * eased;
+    resultsScale = fromScale + (1 - fromScale) * eased;
+    resultsEl.style.opacity = String(opacity);
+    resultsEl.style.transform = `scale(${resultsScale})`;
+    resultsEl.style.filter = `blur(${(1 - eased) * 4}px)`;
+    if (t < 1) resultsAnimHandle = requestAnimationFrame(tick);
+  }
+  resultsAnimHandle = requestAnimationFrame(tick);
+}
+
+// Counts a headline number up from 0 to its real computed value instead of
+// snapping in, formatting with `format` on every frame (so units/decimals
+// stay correct throughout, not just at the end).
+function animateNumber(el, targetValue, format, duration = 650) {
+  if (reduceMotionQuery.matches) {
+    el.textContent = format(targetValue);
+    return;
+  }
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    el.textContent = format(targetValue * eased);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 function populateCrops() {
   for (const [key, crop] of Object.entries(CROPS)) {
     const opt = document.createElement("option");
@@ -120,8 +176,8 @@ form.addEventListener("submit", async (e) => {
 });
 
 function renderResults(schedule) {
-  document.getElementById("summary-mm").textContent = formatMm(schedule.totalNetRequirement);
-  document.getElementById("summary-lha").textContent = formatLitersPerHectare(schedule.litersPerHectare);
+  animateNumber(document.getElementById("summary-mm"), schedule.totalNetRequirement, formatMm);
+  animateNumber(document.getElementById("summary-lha"), schedule.litersPerHectare, formatLitersPerHectare);
 
   const crop = CROPS[cropSelect.value];
   const firstDay = schedule.days[0];
@@ -130,6 +186,7 @@ function renderResults(schedule) {
     : "—";
 
   daysTbody.innerHTML = "";
+  const rows = [];
   for (const day of schedule.days) {
     const tr = document.createElement("tr");
     if (day.pastHarvest) tr.classList.add("past-harvest");
@@ -143,9 +200,20 @@ function renderResults(schedule) {
       <td class="net-req">${formatMm(day.netRequirement)}</td>
     `;
     daysTbody.appendChild(tr);
+    rows.push(tr);
   }
 
-  resultsEl.hidden = false;
+  revealResults();
+
+  // Stagger the rows in on the next frame (so the initial opacity:0 from CSS
+  // actually paints first) - skipped under reduced motion so it's not just
+  // a snappier version of the same sequential reveal.
+  requestAnimationFrame(() => {
+    rows.forEach((tr, i) => {
+      tr.style.transitionDelay = reduceMotionQuery.matches ? "0ms" : `${Math.min(i, 20) * 25}ms`;
+      tr.classList.add("row-in");
+    });
+  });
 }
 
 function setDefaultPlantingDate() {

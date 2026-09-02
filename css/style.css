@@ -112,6 +112,7 @@ main {
 
 .hero h1 {
   font-size: clamp(1.7rem, 4vw, 2.4rem);
+  letter-spacing: -0.02em; /* the largest text on the page: more negative tracking than the base h1/h2 rule */
   margin: 0 0 0.9rem;
 }
 
@@ -218,6 +219,10 @@ input:focus {
   color: var(--text);
 }
 
+.preset-btn:active {
+  transform: scale(0.95);
+}
+
 .location-selected {
   margin: 0.3rem 0 0;
   font-size: 0.82rem;
@@ -242,6 +247,10 @@ input:focus {
   transform: translateY(-1px);
 }
 
+.btn-calc:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
 .btn-calc:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -259,7 +268,9 @@ input:focus {
 
 .results {
   margin-top: 2.2rem;
-  animation: fade-up 0.4s ease both;
+  /* opacity/transform/filter are driven by js/app.js (revealResults), frame by
+     frame, so a re-submit mid-animation reads the current visible value
+     instead of jumping. */
 }
 
 .results-summary {
@@ -331,6 +342,21 @@ input:focus {
 }
 
 .days-table tr.past-harvest {
+  opacity: 0.45;
+}
+
+.days-table tbody tr {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.days-table tbody tr.row-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.days-table tbody tr.row-in.past-harvest {
   opacity: 0.45;
 }
 
