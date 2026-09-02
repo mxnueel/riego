@@ -6,11 +6,11 @@
 
 **Live: [mxnueel.github.io/riego](https://mxnueel.github.io/riego/)**
 
-![riego screenshot](docs/screenshot.png)
+![Cálculo real para jitomate en Culiacán, Sinaloa: 11.4 mm de riego neto recomendado a 7 días, con la tabla diaria de ET0/ETc/lluvia](docs/screenshot.png)
 
 Elige un cultivo, tu fecha de siembra y una ubicación en México, y obtén una recomendación real de riego — calculada con el método FAO-56 Penman-Monteith, el estándar mundial que se enseña en ingeniería agrícola, usando pronóstico del clima real. Sin servidor, sin cuenta.
 
-## Por qué
+## Por qué esto es ingeniería agrícola y no solo consumir una API
 
 Los otros proyectos de este perfil son herramientas de software puro. Este es distinto: es el primero que aplica directamente mi carrera, Ingeniería en Mecatrónica Agrícola. La evapotranspiración de referencia (ET0) la calcula [Open-Meteo](https://open-meteo.com) a partir de datos meteorológicos reales — eso es la parte fácil, una sola llamada a una API. Lo que realmente construí encima es la ingeniería: tomar esa ET0 cruda y aplicarle los coeficientes de cultivo oficiales de la Tabla 12 de la [FAO-56](https://www.fao.org/4/x0490e/x0490e00.htm) según la etapa de crecimiento real del cultivo, ajustados por humedad y viento reales del pronóstico (Ecuaciones 62 y 65 de FAO-56) — no un número de tabla sin ajustar. Es la diferencia entre "consumir una API" y aplicar de verdad lo que se estudia en un programa de ingeniería agrícola.
 
