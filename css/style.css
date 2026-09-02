@@ -2,15 +2,19 @@
   --font-display: "Schibsted Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "Red Hat Mono", "SF Mono", Menlo, monospace;
 
-  --bg: #16140f;
-  --panel: #201c15;
-  --panel-border: #35301f;
-  --text: #f2ede1;
-  --text-dim: #a89d84;
-  --accent: #d98e3f;
-  --accent-dim: #4a3a22;
-  --good: #7fa66b;
-  --error: #d9704f;
+  /* Warm paper/soil, not another dark-mode-plus-accent screen - this is a
+     field tool, and fields are worked in daylight. Same terracotta accent
+     as before (it was already this project's own identity, not a cliche),
+     just re-tuned for contrast against a light ground instead of a dark one. */
+  --bg: #f2ecdc;
+  --panel: #fbf7ec;
+  --panel-border: #ddcda3;
+  --text: #2a2115;
+  --text-dim: #6f5e40;
+  --accent: #96500e;
+  --accent-dim: #ecd9b3;
+  --good: #436b35;
+  --error: #a3452a;
 }
 
 * {
